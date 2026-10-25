@@ -1,7 +1,7 @@
 // A collapsible status widget. Shows current connection state (Connected, Scanning, Disconnected) and expands to reveal the BleScannerList.
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:bike_aid/i18n/strings.g.dart';
+import 'package:zipp/i18n/strings.g.dart';
 import 'ble_scanner_list.dart';
 
 class ConnectivityStatus extends StatelessWidget {
@@ -39,7 +39,7 @@ class ConnectivityStatus extends StatelessWidget {
       statusColor = const Color(0xFFCCCCCC);
       statusIcon = Icons.bluetooth_connected;
     } else if (isConnecting) {
-      statusText = "Connecting...";
+      statusText = t.scanner.connecting;
       statusColor = const Color(0xFFCCCCCC);
       statusIcon = Icons.bluetooth_searching;
     } else if (isScanning) {
@@ -47,7 +47,7 @@ class ConnectivityStatus extends StatelessWidget {
       statusColor = const Color(0xFFCCCCCC);
       statusIcon = Icons.bluetooth_searching;
     } else {
-      statusText = "Disconnected";
+      statusText = t.scanner.disconnected;
       statusColor = const Color(0xFFCCCCCC);
       statusIcon = Icons.bluetooth_disabled;
     }

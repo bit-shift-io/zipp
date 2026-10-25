@@ -1,7 +1,7 @@
 // The secondary screen widget. Hosts the LogTerminal for viewing application logs and sending raw UART commands.
 import 'package:flutter/material.dart';
-import 'package:bike_aid/src/rust/api/protocol.dart';
-import 'package:bike_aid/i18n/strings.g.dart';
+import 'package:zipp/src/rust/api/protocol.dart';
+import 'package:zipp/i18n/strings.g.dart';
 import 'log.dart';
 
 class LogPage extends StatelessWidget {

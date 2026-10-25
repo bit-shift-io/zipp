@@ -1,7 +1,7 @@
 // Displays a list of discovered Bluetooth devices. Allows connecting to a specific device or disconnecting from the current one.
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:bike_aid/i18n/strings.g.dart';
+import 'package:zipp/i18n/strings.g.dart';
 
 class BleScannerList extends StatelessWidget {
   final BluetoothDevice? connectedDevice;

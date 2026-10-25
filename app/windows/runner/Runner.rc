@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "io.bitshift" "\0"
-            VALUE "FileDescription", "bike_aid" "\0"
+            VALUE "FileDescription", "zipp" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "bike_aid" "\0"
+            VALUE "InternalName", "zipp" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 io.bitshift. All rights reserved." "\0"
-            VALUE "OriginalFilename", "bike_aid.exe" "\0"
-            VALUE "ProductName", "bike_aid" "\0"
+            VALUE "OriginalFilename", "zipp.exe" "\0"
+            VALUE "ProductName", "zipp" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,4 +1,4 @@
-# Bike Aid (Rust + Flutter)
+# Zipp (Rust + Flutter)
 
 A high-performance, multiplatform Bluetooth application built with **Flutter** for the UI and **Rust** for the core logic.
 

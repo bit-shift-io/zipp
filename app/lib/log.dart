@@ -1,6 +1,7 @@
 // A terminal-like widget. Renders a scrolling list of logs and provides a text input field for sending manual commands to the scooter.
 import 'package:flutter/material.dart';
-import 'package:bike_aid/src/rust/api/protocol.dart';
+import 'package:zipp/src/rust/api/protocol.dart';
+import 'package:zipp/i18n/strings.g.dart';
 
 class LogTerminal extends StatelessWidget {
   final List<String> logs;
@@ -52,14 +53,17 @@ class LogTerminal extends StatelessWidget {
                     ),
                     child: InkWell(
                       onTap: onClearLogs,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,
                         ),
                         child: Text(
-                          "clear",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          t.scanner.clear,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),

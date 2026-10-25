@@ -7,8 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:bike_aid/src/rust/api/protocol.dart';
-import 'package:bike_aid/src/rust/frb_generated.dart';
+import 'package:zipp/src/rust/api/protocol.dart';
+import 'package:zipp/src/rust/frb_generated.dart';
 
 class ScooterBluetoothService extends ChangeNotifier {
   // State

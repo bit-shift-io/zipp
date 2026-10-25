@@ -26,10 +26,13 @@
   "scanner": {
     "title": "Log",
     "scanning": "Scanning...",
+    "connecting": "Connecting...",
+    "disconnected": "Disconnected",
     "connect": "Connect",
     "disconnect": "Disconnect",
     "unknown": "Unknown Device",
     "nearby": "Nearby Devices",
-    "log": "Log"
+    "log": "Log",
+    "clear": "clear"
   }
 }

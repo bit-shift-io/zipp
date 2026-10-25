@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:bike_aid/src/rust/api/protocol.dart';
+import 'package:zipp/src/rust/api/protocol.dart';
 import 'logger_service.dart';
 import 'main_page.dart';
 import 'log_page.dart';
@@ -10,7 +10,7 @@ import 'bluetooth_service.dart';
 import 'gps_service.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:bike_aid/i18n/strings.g.dart';
+import 'package:zipp/i18n/strings.g.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bike Aid',
+      title: 'Zipp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       themeMode: ThemeMode.dark,
-      home: const MainAppShell(title: 'Bike Aid - Scooter Console'),
+      home: const MainAppShell(title: 'Zipp - Scooter Console'),
     );
   }
 }

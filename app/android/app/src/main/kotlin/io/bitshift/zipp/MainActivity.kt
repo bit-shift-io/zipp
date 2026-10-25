@@ -1,4 +1,4 @@
-package io.bitshift.bike_aid
+package io.bitshift.zipp
 
 import io.flutter.embedding.android.FlutterActivity
 

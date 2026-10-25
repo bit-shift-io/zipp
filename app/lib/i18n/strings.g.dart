@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 50 (25 per locale)
+/// Strings: 56 (28 per locale)
 ///
-/// Built on 2026-07-25 at 07:56 UTC
+/// Built on 2026-10-25 at 00:44 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -183,11 +183,14 @@ class _StringsScannerEn {
 	// Translations
 	String get title => 'Log';
 	String get scanning => 'Scanning...';
+	String get connecting => 'Connecting...';
+	String get disconnected => 'Disconnected';
 	String get connect => 'Connect';
 	String get disconnect => 'Disconnect';
 	String get unknown => 'Unknown Device';
 	String get nearby => 'Nearby Devices';
 	String get log => 'Log';
+	String get clear => 'clear';
 }
 
 // Path: dashboard.units
@@ -258,7 +261,7 @@ class _StringsDashboardZh implements _StringsDashboardEn {
 	@override String get park => '驻车';
 	@override String get brake => '刹车';
 	@override String get horn => '喇叭';
-	@override String get entry => 'Entry';
+	@override String get entry => '门禁';
 	@override String get cruise_up => '巡航\n加速';
 	@override String get cruise_down => '巡航\n减速';
 	@override late final _StringsDashboardUnitsZh units = _StringsDashboardUnitsZh._(_root);
@@ -274,11 +277,14 @@ class _StringsScannerZh implements _StringsScannerEn {
 	// Translations
 	@override String get title => '日志';
 	@override String get scanning => '扫描中...';
+	@override String get connecting => '连接中...';
+	@override String get disconnected => '已断开';
 	@override String get connect => '连接';
 	@override String get disconnect => '断开';
 	@override String get unknown => '未知设备';
 	@override String get nearby => '附近设备';
 	@override String get log => '日志';
+	@override String get clear => '清除';
 }
 
 // Path: dashboard.units
@@ -332,11 +338,14 @@ extension on Translations {
 			case 'dashboard.indicators.off': return 'OFF';
 			case 'scanner.title': return 'Log';
 			case 'scanner.scanning': return 'Scanning...';
+			case 'scanner.connecting': return 'Connecting...';
+			case 'scanner.disconnected': return 'Disconnected';
 			case 'scanner.connect': return 'Connect';
 			case 'scanner.disconnect': return 'Disconnect';
 			case 'scanner.unknown': return 'Unknown Device';
 			case 'scanner.nearby': return 'Nearby Devices';
 			case 'scanner.log': return 'Log';
+			case 'scanner.clear': return 'clear';
 			default: return null;
 		}
 	}
@@ -353,7 +362,7 @@ extension on _StringsZh {
 			case 'dashboard.park': return '驻车';
 			case 'dashboard.brake': return '刹车';
 			case 'dashboard.horn': return '喇叭';
-			case 'dashboard.entry': return 'Entry';
+			case 'dashboard.entry': return '门禁';
 			case 'dashboard.cruise_up': return '巡航\n加速';
 			case 'dashboard.cruise_down': return '巡航\n减速';
 			case 'dashboard.units.kmh': return 'km/h';
@@ -365,11 +374,14 @@ extension on _StringsZh {
 			case 'dashboard.indicators.off': return '关';
 			case 'scanner.title': return '日志';
 			case 'scanner.scanning': return '扫描中...';
+			case 'scanner.connecting': return '连接中...';
+			case 'scanner.disconnected': return '已断开';
 			case 'scanner.connect': return '连接';
 			case 'scanner.disconnect': return '断开';
 			case 'scanner.unknown': return '未知设备';
 			case 'scanner.nearby': return '附近设备';
 			case 'scanner.log': return '日志';
+			case 'scanner.clear': return '清除';
 			default: return null;
 		}
 	}

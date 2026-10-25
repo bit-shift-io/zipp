@@ -8,7 +8,7 @@
     "park": "驻车",
     "brake": "刹车",
     "horn": "喇叭",
-    "entry": "Entry",
+    "entry": "门禁",
     "cruise_up": "巡航\n加速",
     "cruise_down": "巡航\n减速",
     "units": {
@@ -26,10 +26,13 @@
   "scanner": {
     "title": "日志",
     "scanning": "扫描中...",
+    "connecting": "连接中...",
+    "disconnected": "已断开",
     "connect": "连接",
     "disconnect": "断开",
     "unknown": "未知设备",
     "nearby": "附近设备",
-    "log": "日志"
+    "log": "日志",
+    "clear": "清除"
   }
 }

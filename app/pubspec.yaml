@@ -1,4 +1,4 @@
-name: bike_aid
+name: zipp
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -42,7 +42,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   geolocator: ^12.0.0
-  rust_lib_bike_aid:
+  rust_lib_zipp:
     path: rust_builder
   http: ^1.6.0
   connectivity_plus: ^7.0.0

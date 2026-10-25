@@ -9,7 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
-  rust_lib_bike_aid
+  rust_lib_zipp
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)
