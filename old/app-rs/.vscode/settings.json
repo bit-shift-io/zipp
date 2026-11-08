@@ -1,9 +1,0 @@
-{
-    "rust-analyzer.linkedProjects": [
-        "./Cargo.toml"
-    ],
-    "files.exclude": {
-        "target/": true
-    },
-    "makefile.configureOnOpen": false,
-}
