@@ -11,3 +11,16 @@ flutter_rust_bridge = "=2.12.0"
 anyhow = "1.0"
 log = "0.4"
 serde = { version = "1.0", features = ["derive"] }
+
+[workspace]
+resolver = "2"
+members = ["zipp_core"]
+
+[workspace.package]
+version = "2026.11.8"
+
+[patch.crates-io]
+android-activity = { git = "https://github.com/Santuzius/android-activity", tag = "iced_android-v0.1.1" }
+
+[profile.release]
+strip = "debuginfo"
