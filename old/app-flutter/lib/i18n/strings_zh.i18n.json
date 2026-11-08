@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "power": "电源",
+    "alarm": "报警器",
+    "lights": "车灯",
+    "sport": "运动模式",
+    "cruise": "定速巡航",
+    "park": "驻车",
+    "brake": "刹车",
+    "horn": "喇叭",
+    "entry": "门禁",
+    "cruise_up": "巡航\n加速",
+    "cruise_down": "巡航\n减速",
+    "units": {
+      "kmh": "km/h",
+      "km": "km",
+      "celsius": "°C",
+      "mv": "mv",
+      "watts": "w"
+    },
+    "indicators": {
+      "on": "开",
+      "off": "关"
+    }
+  },
+  "scanner": {
+    "title": "日志",
+    "scanning": "扫描中...",
+    "connecting": "连接中...",
+    "disconnected": "已断开",
+    "connect": "连接",
+    "disconnect": "断开",
+    "unknown": "未知设备",
+    "nearby": "附近设备",
+    "log": "日志",
+    "clear": "清除"
+  }
+}
