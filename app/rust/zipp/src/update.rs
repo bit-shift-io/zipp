@@ -14,6 +14,9 @@ impl App {
                 Task::none()
             }
             Message::Transport(_event) => Task::none(),
+            // The remaining dashboard, scanner and log messages are wired in
+            // Task 11; until then they are inert.
+            _ => Task::none(),
         }
     }
 
