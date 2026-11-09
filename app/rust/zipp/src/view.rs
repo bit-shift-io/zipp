@@ -332,14 +332,15 @@ pub fn dashboard(app: &App) -> Element<'_, Message> {
 }
 
 fn dashboard_page(app: &App) -> Element<'_, Message> {
-    column![dashboard(app)].height(Length::Fill).into()
+    column![dashboard(app), crate::components::scanner::page(app)]
+        .height(Length::Fill)
+        .into()
 }
 
 pub fn view(app: &App, _window: iced::window::Id) -> Element<'_, Message> {
     let body = match app.page {
         Page::Dashboard => dashboard_page(app),
-        // The log page is composed in Task 10.
-        Page::Log => dashboard_page(app),
+        Page::Log => crate::components::log::page(app),
     };
     container(body)
         .width(Length::Fill)

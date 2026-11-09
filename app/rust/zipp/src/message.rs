@@ -3,7 +3,7 @@ use zipp_core::gps::GpsUpdate;
 use zipp_core::protocol::ScooterCommand;
 use zipp_core::transport::{ScanDevice, TransportEvent};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Message {
     Noop,
     Tick,

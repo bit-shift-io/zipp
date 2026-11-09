@@ -3,6 +3,7 @@ use iced::Color;
 pub const BACKGROUND: Color = Color::BLACK;
 pub const TEXT: Color = Color::WHITE;
 pub const MUTED: Color = Color::from_rgb8(0xCC, 0xCC, 0xCC);
+pub const GREY: Color = Color::from_rgb8(0x9E, 0x9E, 0x9E);
 pub const DISABLED: Color = Color::from_rgb8(0x33, 0x33, 0x33);
 pub const ACTIVE_FILL: Color = DISABLED;
 pub const BORDER: Color = Color {
