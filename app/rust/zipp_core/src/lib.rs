@@ -5,4 +5,5 @@ pub mod gps;
 pub mod i18n;
 pub mod log;
 pub mod protocol;
+pub mod session;
 pub mod transport;
