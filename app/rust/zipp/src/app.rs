@@ -24,6 +24,7 @@ pub struct App {
     pub insets: iced_android::Insets,
     pub scale: f32,
     pub now: NaiveTime,
+    pub mobile: bool,
 }
 
 pub fn window_settings() -> window::Settings {
@@ -54,6 +55,7 @@ impl App {
             insets: iced_android::Insets::default(),
             scale: 1.0,
             now: zipp_core::log::now(),
+            mobile: cfg!(target_os = "android"),
         }
     }
 

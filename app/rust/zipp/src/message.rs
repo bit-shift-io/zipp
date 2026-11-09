@@ -7,6 +7,7 @@ use zipp_core::transport::{ScanDevice, TransportEvent};
 pub enum Message {
     Noop,
     Tick,
+    ReconnectTick,
     Transport(TransportEvent),
     WindowOpened(window::Id),
     BeginScan,
@@ -16,6 +17,7 @@ pub enum Message {
     Disconnect,
     Send(ScooterCommand),
     Entry,
+    EntryFinished(Result<u16, String>),
     OpenLog,
     Back,
     ClearLogs,
