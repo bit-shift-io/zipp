@@ -1,14 +1,13 @@
-gradle-wrapper.jar
+# Adapted from qlaunch (bitshift, MIT). The Gradle wrapper (gradlew,
+# gradlew.bat, gradle/wrapper/*) is committed on purpose for reproducibility.
 /.gradle
+/.kotlin
 /captures/
-/gradlew
-/gradlew.bat
 /local.properties
-GeneratedPluginRegistrant.java
 .cxx/
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/to/reference-keystore
+# Never publicly share a signing key.
 key.properties
+keystore.properties
 **/*.keystore
 **/*.jks

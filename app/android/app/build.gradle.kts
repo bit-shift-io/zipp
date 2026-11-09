@@ -1,39 +1,64 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
-    // AGP provides built-in Kotlin; apply Flutter after the Android plugin.
-    id("dev.flutter.flutter-gradle-plugin")
+    id("org.jetbrains.kotlin.android")
 }
+
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasSharedKey = keystoreProperties.getProperty("storeFile") != null
 
 android {
     namespace = "io.bitshift.zipp"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 36
+    ndkVersion = "28.2.13676358"
+
+    sourceSets.getByName("main").java.setSrcDirs(listOf(
+        "src/main/kotlin", providers.gradleProperty("icedAndroidJava").get()
+    ))
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.add("-Xlint:-options")
+    defaultConfig {
+        applicationId = "io.bitshift.zipp"
+        minSdk = 34
+        targetSdk = 36
+        versionCode = providers.gradleProperty("zippVersionCode").getOrElse("1").toInt()
+        versionName = providers.gradleProperty("zippVersionName").getOrElse("0.0.0")
+        ndk { abiFilters += "arm64-v8a" }
     }
 
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "io.bitshift.zipp"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+    signingConfigs {
+        if (hasSharedKey) {
+            create("shared") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = if (hasSharedKey) {
+                signingConfigs.getByName("shared")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasSharedKey) {
+                signingConfigs.getByName("shared")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
@@ -42,8 +67,4 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
-}
-
-flutter {
-    source = "../.."
 }
