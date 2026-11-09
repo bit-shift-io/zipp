@@ -140,6 +140,8 @@ impl App {
             iced::time::every(Duration::from_secs(1)).map(|_| Message::Tick),
             iced::time::every(Duration::from_secs(5)).map(|_| Message::ReconnectTick),
             crate::platform::transport_subscription(),
+            crate::platform::back_subscription(),
+            crate::platform::gps_subscription(),
             iced_android::insets().map(Message::Insets),
             iced_android::system_scale().map(Message::SystemScale),
             iced::keyboard::listen().filter_map(|event| match event {

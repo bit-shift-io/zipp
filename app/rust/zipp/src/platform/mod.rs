@@ -11,6 +11,7 @@ use zipp_core::transport::{TransportCommand, TransportEvent};
 
 use crate::message::Message;
 
+pub(crate) mod android;
 #[cfg(target_os = "linux")]
 mod desktop;
 
@@ -48,11 +49,23 @@ static TRANSPORT: OnceLock<Arc<dyn Transport>> = OnceLock::new();
 /// both observe the same real transport on Linux instead of one falling back to
 /// the no-op.
 fn init_transport() -> Arc<dyn Transport> {
+    #[cfg(target_os = "android")]
+    {
+        android::transport()
+            .map(|transport| transport as Arc<dyn Transport>)
+            .unwrap_or_else(|| {
+                log::warn!(
+                    "Android transport was not installed before the app started; \
+                     falling back to NoopTransport"
+                );
+                Arc::new(NoopTransport::new())
+            })
+    }
     #[cfg(target_os = "linux")]
     {
         desktop::spawn()
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "android", target_os = "linux")))]
     {
         Arc::new(NoopTransport::new())
     }
@@ -67,7 +80,40 @@ pub fn transport() -> Arc<dyn Transport> {
 }
 
 pub fn lang() -> Lang {
-    zipp_core::i18n::detect()
+    #[cfg(target_os = "android")]
+    {
+        android::current_lang()
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        zipp_core::i18n::detect()
+    }
+}
+
+/// The Android hardware Back button arrives on a broadcast channel; everywhere
+/// else the keyboard path already drives `Message::Back`.
+pub fn back_subscription() -> Subscription<Message> {
+    #[cfg(target_os = "android")]
+    {
+        android::back_subscription()
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        Subscription::none()
+    }
+}
+
+/// GPS updates bypass `TransportEvent` on a dedicated channel so they reach
+/// `Message::Gps` without round-tripping through the session.
+pub fn gps_subscription() -> Subscription<Message> {
+    #[cfg(target_os = "android")]
+    {
+        android::gps_subscription()
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        Subscription::none()
+    }
 }
 
 pub async fn send_entry() -> Result<u16, String> {

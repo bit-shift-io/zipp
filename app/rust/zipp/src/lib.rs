@@ -6,6 +6,8 @@ pub mod app;
 pub mod components;
 pub mod fonts;
 pub mod icons;
+#[cfg(target_os = "android")]
+mod jni;
 pub mod message;
 mod platform;
 pub mod theme;
@@ -32,4 +34,16 @@ pub fn run() -> iced::Result {
     }
 
     daemon.run()
+}
+
+/// The Android entry point installed by the native-activity glue. Logging is
+/// already set up by `Java_io_bitshift_zipp_ZippBridge_nativeInit`, which runs
+/// before the window starts, so a crash here is still logged.
+#[cfg(target_os = "android")]
+#[unsafe(no_mangle)]
+fn android_main(app: iced_android::AndroidApp) {
+    iced_android::init(app);
+    if let Err(error) = run() {
+        log::error!("iced failed: {error}");
+    }
 }
