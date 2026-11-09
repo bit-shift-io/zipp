@@ -3,6 +3,7 @@
 use iced::window;
 
 pub mod app;
+pub mod components;
 pub mod fonts;
 pub mod icons;
 pub mod message;
