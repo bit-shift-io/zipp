@@ -2,17 +2,27 @@ use std::sync::{Arc, OnceLock};
 
 use futures::SinkExt;
 use iced::Subscription;
+#[cfg(not(target_os = "linux"))]
 use tokio::sync::{broadcast, watch};
 use zipp_core::i18n::Lang;
-use zipp_core::transport::{Transport, TransportCommand, TransportEvent};
+use zipp_core::transport::Transport;
+#[cfg(not(target_os = "linux"))]
+use zipp_core::transport::{TransportCommand, TransportEvent};
 
 use crate::message::Message;
 
+#[cfg(target_os = "linux")]
+mod desktop;
+
+/// Stand-in transport for non-Linux targets and tests that only need the
+/// channel plumbing. Linux uses the real `btleplug` actor instead.
+#[cfg(not(target_os = "linux"))]
 pub struct NoopTransport {
     events: broadcast::Sender<TransportEvent>,
     wifi: watch::Sender<bool>,
 }
 
+#[cfg(not(target_os = "linux"))]
 impl NoopTransport {
     pub fn new() -> Self {
         let (events, _) = broadcast::channel(64);
@@ -21,6 +31,7 @@ impl NoopTransport {
     }
 }
 
+#[cfg(not(target_os = "linux"))]
 impl Transport for NoopTransport {
     fn send(&self, _command: TransportCommand) {}
     fn subscribe(&self) -> broadcast::Receiver<TransportEvent> {
@@ -33,14 +44,26 @@ impl Transport for NoopTransport {
 
 static TRANSPORT: OnceLock<Arc<dyn Transport>> = OnceLock::new();
 
+/// The single initialiser shared by [`ensure_transport`] and [`transport`], so
+/// both observe the same real transport on Linux instead of one falling back to
+/// the no-op.
+fn init_transport() -> Arc<dyn Transport> {
+    #[cfg(target_os = "linux")]
+    {
+        desktop::spawn()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        Arc::new(NoopTransport::new())
+    }
+}
+
 pub fn ensure_transport() {
-    TRANSPORT.get_or_init(|| Arc::new(NoopTransport::new()));
+    TRANSPORT.get_or_init(init_transport);
 }
 
 pub fn transport() -> Arc<dyn Transport> {
-    TRANSPORT
-        .get_or_init(|| Arc::new(NoopTransport::new()))
-        .clone()
+    TRANSPORT.get_or_init(init_transport).clone()
 }
 
 pub fn lang() -> Lang {
