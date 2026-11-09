@@ -1,0 +1,28 @@
+[package]
+name = "zipp"
+version.workspace = true
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "zipp"
+path = "src/main.rs"
+
+[dependencies]
+zipp_core = { path = "../zipp_core" }
+iced = { git = "https://github.com/Santuzius/iced", tag = "iced_android-v0.1.1", default-features = false, features = ["wgpu", "tokio", "image", "wayland", "advanced", "web-colors", "canvas"] }
+iced_android = { git = "https://github.com/Santuzius/iced_android", tag = "v0.1.1" }
+tokio = { version = "1", features = ["sync", "rt-multi-thread", "time"] }
+futures = { version = "0.3", features = ["executor"] }
+log = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+reqwest = { version = "0.12", default-features = false }
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.15"
+jni = "0.21"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+btleplug = "0.13.5"

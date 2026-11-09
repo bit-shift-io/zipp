@@ -14,7 +14,7 @@ serde = { version = "1.0", features = ["derive"] }
 
 [workspace]
 resolver = "2"
-members = ["zipp_core"]
+members = ["zipp_core", "zipp"]
 
 [workspace.package]
 version = "2026.11.8"
