@@ -81,10 +81,10 @@ ledger):
   Flutter used **1 px** in those two places (2 px on the dashboard in both).
 - The scanner disconnect label is **14 px** vs Flutter's **16 px**.
 
-## Desktop Chinese font
+## Chinese font
 
-- Detected font path: **none** — the explicit probe in `fonts.rs`
-  (`desktop_cjk_font()`) checks a fixed list of Noto CJK / WQY / AR PL paths and
+- Detected font path (desktop): **none** — the explicit probe in `fonts.rs`
+  (`cjk_font()`) checks a fixed list of Noto CJK / WQY / AR PL paths and
   none of them exists on this host, so the probe registers no CJK face.
 - Caveat: iced's text stack (cosmic-text 0.15) also loads *all* system fonts
   through fontconfig (`db.load_system_fonts()`) and does per-glyph fallback.
@@ -93,4 +93,7 @@ ledger):
   probe list does not cover, so Chinese glyphs are expected to resolve via that
   fallback. Chinese rendering was **not** visually confirmed on the desktop (the
   checklist ran in an English locale and no input tool was available).
-- Android always has CJK: `iced_android::fonts()` registers the system fonts.
+- Android: `iced_android::fonts()` registers only Roboto, the emoji and symbol
+  fonts and DroidSansMono — **no CJK face** — so `zipp`'s own probe registers
+  `/system/fonts/NotoSansCJK-Regular.ttc` (present on the test device), falling
+  back to `NotoSansCJKsc-Regular.otf` and DroidSansFallback.ttf.

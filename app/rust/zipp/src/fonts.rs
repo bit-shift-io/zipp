@@ -8,15 +8,16 @@ pub const ICON_FONT_BYTES: &[u8] = include_bytes!("../assets/MaterialIcons-Regul
 
 pub fn all() -> Vec<Cow<'static, [u8]>> {
     let mut fonts = iced_android::fonts();
-    if let Some(cjk) = desktop_cjk_font() {
+    if let Some(cjk) = cjk_font() {
         fonts.push(Cow::Owned(cjk));
     }
     fonts.push(Cow::Borrowed(ICON_FONT_BYTES));
     fonts
 }
 
+/// iced_android registers only Latin/symbol/mono faces, so a Chinese locale would render as tofu. Probe the common system CJK paths ourselves.
 #[cfg(target_os = "linux")]
-fn desktop_cjk_font() -> Option<Vec<u8>> {
+fn cjk_font() -> Option<Vec<u8>> {
     const PATHS: &[&str] = &[
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJKsc-Regular.otf",
@@ -28,8 +29,19 @@ fn desktop_cjk_font() -> Option<Vec<u8>> {
     PATHS.iter().find_map(|path| std::fs::read(path).ok())
 }
 
-#[cfg(not(target_os = "linux"))]
-fn desktop_cjk_font() -> Option<Vec<u8>> {
+/// Android ships a CJK face in `/system/fonts`; `iced_android::fonts()` does not load it.
+#[cfg(target_os = "android")]
+fn cjk_font() -> Option<Vec<u8>> {
+    const PATHS: &[&str] = &[
+        "/system/fonts/NotoSansCJK-Regular.ttc",
+        "/system/fonts/NotoSansCJKsc-Regular.otf",
+        "/system/fonts/DroidSansFallback.ttf",
+    ];
+    PATHS.iter().find_map(|path| std::fs::read(path).ok())
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "android")))]
+fn cjk_font() -> Option<Vec<u8>> {
     None
 }
 

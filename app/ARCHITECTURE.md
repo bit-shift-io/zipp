@@ -66,8 +66,12 @@ button/input -> Message -> App::update -> session mutation + Task
 - GPS updates carry their own channel (`Message::Gps`), and the Android Back
   button its own (`Message::Back`); neither round-trips through the session.
 
-There is no mutable global state except the Android transport handle, installed
-by `nativeInit` before the window starts (see below).
+The only process-global state is the Android-side transport handle, the scan
+snapshot and the last GPS status, all behind `OnceLock`/`Mutex`; the model
+itself is owned by `App`. The transport handle is installed by `nativeInit`
+before the window starts (see below).
+
+`zipp` depends on `zipp_core`, never the reverse.
 
 ---
 
