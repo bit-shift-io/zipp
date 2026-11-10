@@ -22,8 +22,8 @@ I designed this tool as a controller to act as a interface for controlling my eb
 ## Where to start
 
 * mcu-nrf-rs - mcu software
-* app-java - android app  
+* app - iced dashboard (Linux + Android)
 * docs - documentation
 * diagrams - circuit diagrams
-* everything else is old!
+* old is archived on the `old` branch
 

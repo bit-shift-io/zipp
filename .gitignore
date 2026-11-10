@@ -1,0 +1,11 @@
+target/
+build/
+dist/
+.gradle/
+.kotlin/
+.idea/
+*.iml
+*.apk
+*.aab
+local.properties
+keystore.properties

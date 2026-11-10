@@ -1,84 +1,66 @@
-# Zipp (Rust + Flutter)
+# Zipp
 
-A high-performance, multiplatform Bluetooth application built with **Flutter** for the UI and **Rust** for the core logic.
+Zipp is a Rust + [iced](https://iced.rs) dashboard for the `BScooter` ebike
+controller. It speaks the scooter's BLE protocol and renders two screens:
 
-> **Architecture Note**: This project uses **Rust** for all core application logic (UUIDs, parsing, state management) and **Dart/Flutter** strictly for the GUI and device transport. This separation allows for easily swapping the GUI framework in the future while preserving the business logic.
+- **Dashboard** — the live readout (speed, battery voltage/current, light and
+  alarm state, odometer, trip time) plus the controls (power, lights, horn,
+  alarm, Entry).
+- **Log** — a scrolling diagnostic log of every BLE command and notification,
+  with a manual UART input.
 
-## Project Structure
+The same codebase builds for **Linux desktop** (development, over BlueZ) and
+**Android** (the shipping target). There is no cross-platform UI toolkit or FFI
+bridge: Rust owns the protocol, the session state machine and the transport
+policy, and the Kotlin layer only answers OS questions. See
+[`ARCHITECTURE.md`](ARCHITECTURE.md) for the crate layout and data flow, and
+[`docs/technical-notes.md`](docs/technical-notes.md) for build measurements and
+on-device results.
 
-### 🛠️ Core Logic (Rust)
-The "brain" of the app lives in the `rust/` directory.
-- **protocol.rs**: **Entry Point.** Contains the scooter protocol implementation.
-  - `ScooterState`: The central data structure representing the bike (speed, battery, light status, etc.).
-  - `parse_characteristic_data()`: Converts raw bytes from the bike into the `ScooterState`.
-  - `create_command_bytes()`: Generates the raw bytes to send to the bike for actions like Power, Alarm, or Horn.
-- **`src/api/`**: Contains the modules exposed to Flutter.
+## Requirements
 
-### 📱 Frontend (Flutter)
-The UI and Bluetooth transport are in the `lib/` directory.
-- **main.dart**: **GUI Entry Point.**
-  - **Bluetooth Manager**: Handles scanning for "BScooter", auto-connecting, and characteristic subscriptions.
-  - **Page Navigation**: Implements the fullscreen `PageView` (Dashboard <-> Log).
-  - **Control Panel**: The button-based interface that triggers Rust commands.
-- **`lib/src/rust/`**: **Generated Bridge.** Contains the Dart bindings that allow calling Rust functions seamlessly.
+- **Rust** (stable, edition 2024).
+- **JDK 21** — a full JDK with `javac`; `/opt/jbr-21` is auto-detected if
+  `JAVA_HOME` is unset.
+- **Android SDK 36** and **NDK `28.2.13676358`** (`ANDROID_HOME` /
+  `ANDROID_NDK_HOME`), plus the checked-in Gradle wrapper.
+- **Linux desktop BLE** needs **BlueZ** (the `btleplug` backend) and a
+  Wayland/X session.
 
-## Prerequisites
+## Commands
 
-- **Flutter SDK**
-- **Rust** (Stable)
-- **Android NDK** (for Android builds)
+Run these from `app/` (the Rust tests run from `rust/`):
 
-## Setup & Running
+| Command | What it does |
+| :--- | :--- |
+| `./run.sh` | Run the desktop app. Extra args go to cargo, e.g. `./run.sh --release`. |
+| `cargo test --workspace` | Run the Rust tests (from `rust/`). |
+| `bash scripts/build.sh debug` | Build the arm64 Android APK (`debug` or `release`). |
+| `./run_adb.sh` | Build, install, launch and tail logcat on a device. |
+| `bash scripts/release.sh` | Build versioned artefacts into `dist/`. |
+| `bash scripts/publish.sh` | Publish `dist/` as a GitHub release. |
 
-### 1. Fix PATH & Install Tools (Once)
-in the scripts repo run ``./install_android_flutter.sh``
-OR the manual pain
-install android + sdk + tools then:
-```bash
-sudo pacman -S cmake ninja
-set -U fish_user_paths $HOME/.cargo/bin $fish_user_paths
-cargo install flutter_rust_bridge_codegen
-rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
-cargo install cargo-ndk
-flutter doctor
+## Entry and cleartext HTTP
+
+The Entry control POSTs to the scooter gateway at
+`http://192.168.1.3:1880/entry` (`ENTRY_URL` in `rust/zipp_core/src/entry.rs`).
+On Android the manifest sets `android:usesCleartextTraffic="true"` so this
+plain-HTTP request is permitted; without it the platform blocks the call.
+
+## Logging
+
+Both targets log through the `log` crate. On Android the app installs an
+`android_logger` tagged **`zipp`**:
+
+```sh
+adb logcat -s zipp
 ```
 
-### 2. Generate Code
-Run this to link the Rust code and generate translations:
-```bash
-./build.sh
-```
-confirm adb on the device
+On desktop, `env_logger` writes the same lines to stdout.
 
-### 3. Run the App
-```bash
-./run.sh
-```
+## Documentation
 
-## App Icon
-
-The source artwork is `assets/app_icon.svg`. After editing it, regenerate the
-PNG source and platform icons from this directory (requires Inkscape):
-
-```bash
-inkscape assets/app_icon.svg --export-type=png --export-width=1024 --export-height=1024 --export-filename=assets/app_icon.png
-dart run flutter_launcher_icons
-for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-  magick "android/app/src/main/res/mipmap-$density/mipmap.png" "android/app/src/main/res/mipmap-$density/ic_launcher.png"
-done
-```
-
-The final step requires ImageMagick and refreshes Android's fallback icons as
-well as the `mipmap` icons used by the app manifest.
-
-## Features
-- **Native Bluetooth**: Fast and reliable scanning using `flutter_blue_plus`.
-- **HTTP Entry Control**: Control IoT entry points via HTTP requests (with offline queuing).
-- **Log & Diagnostic Terminal**: Real-time logging of Bluetooth commands and responses with manual UART input.
-- **Permission Handling**: Dynamic requests for Location and Bluetooth.
-- **Dark Theme**: Modern Material 3 dark UI.
-
-## Troubleshooting
-
-- **Missing Imports**: If `main.dart` shows errors after generation, uncomment the bridge imports at the top of the file.
-- **Cargo Expand**: If generation fails with "cargo expand returned empty output", run `cargo build` inside the `rust/` folder once.
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — crates, the transport contract, the
+  Android lifecycle, where to change what.
+- [`docs/technical-notes.md`](docs/technical-notes.md) — build measurements,
+  device results and accepted deviations.
