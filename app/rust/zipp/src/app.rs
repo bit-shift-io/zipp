@@ -70,7 +70,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn opens_one_resizable_window_at_the_flutter_size() {
+    fn opens_one_resizable_window_at_the_legacy_size() {
         let settings = window_settings();
         assert_eq!(settings.size, Size::new(420.0, 820.0));
         assert_eq!(settings.min_size, Some(Size::new(360.0, 640.0)));

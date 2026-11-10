@@ -184,7 +184,7 @@ mod tests {
     }
 
     #[test]
-    fn strings_match_the_flutter_values() {
+    fn strings_match_the_legacy_values() {
         let en = Lang::En.strings();
         assert_eq!(en.power, "Power");
         assert_eq!(en.cruise_up, "Cruise\nUp");

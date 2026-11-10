@@ -45,7 +45,7 @@ fn bold() -> iced::Font {
 }
 
 /// A button that only makes its contents clickable: no background and no
-/// border, matching the transparent `InkWell`/`ListTile` look in Flutter.
+/// border, matching the transparent `InkWell`/`ListTile` look in the original app.
 fn transparent(_theme: &iced::Theme, _status: button::Status) -> button::Style {
     button::Style::default()
 }

@@ -296,7 +296,7 @@ mod tests {
     }
 
     #[test]
-    fn data_characteristics_match_the_flutter_mapping() {
+    fn data_characteristics_match_the_legacy_mapping() {
         let mut s = state();
         s = parse_characteristic_data(s, "2001", &[42]).state;
         s = parse_characteristic_data(s, "2002", &[0x34, 0x12]).state;

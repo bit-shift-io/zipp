@@ -1,8 +1,8 @@
 # Zipp architecture
 
 A pure **iced + Rust** Android dashboard for the `BScooter`, with a Linux
-desktop target used for development. There is no Flutter, Dart or bridge: the
-old Dart tree was removed and must not be reintroduced.
+desktop target used for development. There is no cross-platform UI toolkit or
+FFI bridge left: the old UI tree was removed and must not be reintroduced.
 
 The design rule running through the whole codebase is **the core is the source
 of truth**. Rust — not the UI, and not Kotlin — owns the scooter protocol, the
@@ -160,8 +160,8 @@ and `scale`, the current time, and the `mobile` flag that selects the Entry
 policy. It also holds the `Arc<dyn Transport>`.
 
 The two pages are Dashboard and Log. The only deliberate UI deviation is that
-the switch between them is an **instant swap** rather than Flutter's 300 ms
-slide; every other layout, colour, size and interaction is preserved (the
+the switch between them is an **instant swap** rather than the original app's
+300 ms slide; every other layout, colour, size and interaction is preserved (the
 accepted approximations are listed in `docs/technical-notes.md`).
 
 ---

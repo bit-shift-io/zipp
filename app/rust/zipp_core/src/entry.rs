@@ -47,7 +47,7 @@ mod tests {
     }
 
     #[test]
-    fn the_url_matches_flutter() {
+    fn the_url_matches_the_legacy_app() {
         assert_eq!(ENTRY_URL, "http://192.168.1.3:1880/entry");
     }
 }

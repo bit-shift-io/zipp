@@ -139,7 +139,7 @@ object ZippBridge {
             return
         }
         // `onAdapterState(false)` already makes the core log the single
-        // "Bluetooth is off" line (as Flutter does); a second `onError` would
+        // "Bluetooth is off" line (as the original app does); a second `onError` would
         // duplicate it on every reconnect tick.
         val bleAdapter = adapter ?: run {
             onAdapterState(false)

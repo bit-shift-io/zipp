@@ -360,7 +360,7 @@ mod tests {
     use zipp_core::protocol::ScooterState;
 
     #[test]
-    fn twelve_hour_clock_matches_flutter() {
+    fn twelve_hour_clock_matches_the_legacy_app() {
         assert_eq!(clock_12h(0, 5), ("12:05".into(), "am"));
         assert_eq!(clock_12h(11, 59), ("11:59".into(), "am"));
         assert_eq!(clock_12h(12, 0), ("12:00".into(), "pm"));
@@ -369,7 +369,7 @@ mod tests {
     }
 
     #[test]
-    fn empty_values_use_the_flutter_defaults() {
+    fn empty_values_use_the_legacy_defaults() {
         assert_eq!(value(Some(""), "00"), "00");
         assert_eq!(value(None, "00"), "00");
         assert_eq!(value(Some("42"), "00"), "42");

@@ -400,7 +400,7 @@ mod tests {
     }
 
     #[test]
-    fn commands_log_the_flutter_text_and_write_the_action() {
+    fn commands_log_the_legacy_text_and_write_the_action() {
         let mut s = ScooterSession::new(Lang::En);
         s.apply(
             TransportEvent::Connected {

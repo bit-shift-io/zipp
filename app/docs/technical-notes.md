@@ -72,14 +72,15 @@ unknown rather than estimated.
 
 ## Deviations
 
-Accepted approximations against the Flutter screens (all recorded in the port
-ledger):
+Accepted approximations against the original app's screens (all recorded in the
+port ledger):
 
-- Dashboard/log switch is an instant swap instead of Flutter's 300 ms slide.
+- Dashboard/log switch is an instant swap instead of the original 300 ms slide.
 - Text baseline alignment is approximated with bottom alignment.
 - The log-page and scanner dividers are `chrome::divider()` at **2 px**, where
-  Flutter used **1 px** in those two places (2 px on the dashboard in both).
-- The scanner disconnect label is **14 px** vs Flutter's **16 px**.
+  the original app used **1 px** in those two places (2 px on the dashboard in
+  both).
+- The scanner disconnect label is **14 px** vs the original app's **16 px**.
 
 ## Chinese font
 

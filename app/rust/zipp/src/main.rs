@@ -1,6 +1,6 @@
 fn main() -> iced::Result {
     // Desktop-only binary: Android starts through `android_main`, where
-    // `android_logger` is installed instead. Flutter printed entry and
+    // `android_logger` is installed instead. The original app printed entry and
     // diagnostic lines to the console with `debugPrint`, so mirror that on
     // stdout here. `RUST_LOG` overrides the default.
     #[cfg(not(target_os = "android"))]

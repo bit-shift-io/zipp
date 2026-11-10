@@ -53,7 +53,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn colours_match_the_flutter_values() {
+    fn colours_match_the_legacy_values() {
         assert_eq!(BACKGROUND, Color::BLACK);
         assert_eq!(TEXT, Color::WHITE);
         assert_eq!(MUTED, Color::from_rgb8(0xCC, 0xCC, 0xCC));
