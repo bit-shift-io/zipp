@@ -70,10 +70,10 @@ pub fn speed_text(
     status: GpsStatus,
     gps_speed_kmh: Option<f64>,
 ) -> String {
-    if status == GpsStatus::Active {
-        if let Some(speed) = gps_speed_kmh {
-            return format!("{:02}", speed.round() as i64);
-        }
+    if status == GpsStatus::Active
+        && let Some(speed) = gps_speed_kmh
+    {
+        return format!("{:02}", speed.round() as i64);
     }
     value(state.map(|s| s.speed.as_str()), "00")
 }
@@ -118,7 +118,7 @@ fn gps_row(status: GpsStatus) -> Element<'static, Message> {
 fn cruise_bars(cruise_level: Option<i32>) -> Element<'static, Message> {
     let mut bars = column![].height(Length::Fill);
     for level in (1..=5).rev() {
-        let active = cruise_level.map_or(true, |current| current >= level);
+        let active = cruise_level.is_none_or(|current| current >= level);
         let color = if active {
             theme::MUTED
         } else {

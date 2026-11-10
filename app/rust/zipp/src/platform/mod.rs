@@ -33,6 +33,13 @@ impl NoopTransport {
 }
 
 #[cfg(not(target_os = "linux"))]
+impl Default for NoopTransport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
 impl Transport for NoopTransport {
     fn send(&self, _command: TransportCommand) {}
     fn subscribe(&self) -> broadcast::Receiver<TransportEvent> {

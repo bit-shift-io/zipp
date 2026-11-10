@@ -27,3 +27,7 @@ jni = "0.21"
 [target.'cfg(not(target_os = "android"))'.dependencies]
 btleplug = "0.13.5"
 uuid = "1"
+# Desktop console logging: Android uses `android_logger`, and Flutter printed
+# entry/diagnostic lines with `debugPrint`, so the desktop binary needs a `log`
+# sink too (the plan's checklist reads the entry result from stdout).
+env_logger = "0.11"

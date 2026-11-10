@@ -156,10 +156,10 @@ impl Lang {
 /// Desktop detection: `LC_ALL`, then `LC_MESSAGES`, then `LANG`.
 pub fn detect() -> Lang {
     for key in ["LC_ALL", "LC_MESSAGES", "LANG"] {
-        if let Ok(value) = std::env::var(key) {
-            if !value.is_empty() {
-                return Lang::from_tag(&value);
-            }
+        if let Ok(value) = std::env::var(key)
+            && !value.is_empty()
+        {
+            return Lang::from_tag(&value);
         }
     }
     Lang::En
