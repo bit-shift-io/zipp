@@ -37,7 +37,7 @@ unknown rather than estimated.
 | Command | Result |
 | --- | --- |
 | `cargo fmt --all --check` | clean |
-| `cargo clippy -p zipp_core -p zipp --all-targets -- -D warnings` | clean |
+| `cargo clippy --workspace --all-targets -- -D warnings` | clean (was `-p zipp_core -p zipp` before Task 19 removed the Flutter crate) |
 | `cargo clippy -p zipp --all-targets --target aarch64-linux-android -- -D warnings` | clean |
 | `cargo test --workspace` | 72 passed (29 `zipp` + 43 `zipp_core`), 0 failed, 0 ignored |
 | `cargo check -p zipp --target aarch64-linux-android` | clean |
@@ -81,6 +81,9 @@ port ledger):
   the original app used **1 px** in those two places (2 px on the dashboard in
   both).
 - The scanner disconnect label is **14 px** vs the original app's **16 px**.
+- The UART input placeholder (`...`) renders at the field's **18 px** rather
+  than the original **20 px**; iced gives the value and the placeholder one
+  size.
 
 ## Chinese font
 

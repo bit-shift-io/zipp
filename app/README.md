@@ -3,9 +3,9 @@
 Zipp is a Rust + [iced](https://iced.rs) dashboard for the `BScooter` ebike
 controller. It speaks the scooter's BLE protocol and renders two screens:
 
-- **Dashboard** — the live readout (speed, battery voltage/current, light and
-  alarm state, odometer, trip time) plus the controls (power, lights, horn,
-  alarm, Entry).
+- **Dashboard** — the live readout (speed, temperature, battery level and
+  power, 12-hour clock, odometer, brake/cruise/park indicators and cruise bars)
+  plus the controls (power, alarm, lights, sport, cruise up/down, horn, Entry).
 - **Log** — a scrolling diagnostic log of every BLE command and notification,
   with a manual UART input.
 

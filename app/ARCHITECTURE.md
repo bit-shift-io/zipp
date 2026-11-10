@@ -188,4 +188,4 @@ accepted approximations are listed in `docs/technical-notes.md`).
 - `cargo check -p zipp --target aarch64-linux-android` exercises the non-Linux
   (no `btleplug`) build.
 - `cargo fmt --all --check` and
-  `cargo clippy -p zipp_core -p zipp --all-targets -- -D warnings` are clean.
+  `cargo clippy --workspace --all-targets -- -D warnings` are clean.
