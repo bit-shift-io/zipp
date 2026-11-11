@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothStatusCodes
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -24,6 +25,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import java.lang.ref.WeakReference
 import java.util.UUID
 
@@ -41,6 +43,8 @@ object ZippBridge {
     private const val REQUEST_PERMISSIONS = 1
     private const val SCAN_TIMEOUT_MS = 15_000L
     private const val CONNECT_TIMEOUT_MS = 10_000L
+    private const val GATT_WATCHDOG_MS = 2_000L
+    private const val LOG_TAG = "zipp"
 
     private var activity: WeakReference<MainActivity>? = null
     private lateinit var context: Context
@@ -58,6 +62,36 @@ object ZippBridge {
     private var connectivity: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private val handler = Handler(Looper.getMainLooper())
+
+    // Android allows one outstanding GATT operation per connection, so every
+    // subscribe/read/write is queued and the next one starts only when the
+    // previous callback arrives. Issuing them concurrently (as an earlier
+    // version did) silently drops all but the first, which leaves notifications
+    // disabled and the dashboard stuck on its defaults.
+    private sealed class GattOp {
+        abstract val characteristic: BluetoothGattCharacteristic
+
+        class Enable(
+            override val characteristic: BluetoothGattCharacteristic,
+            val indicate: Boolean,
+        ) : GattOp()
+
+        class Read(override val characteristic: BluetoothGattCharacteristic) : GattOp()
+
+        class Write(
+            override val characteristic: BluetoothGattCharacteristic,
+            val bytes: ByteArray,
+            val writeType: Int,
+        ) : GattOp()
+    }
+
+    // Rust calls the command methods from the native `android_main` thread,
+    // while the GATT callbacks (and the watchdog) arrive on the Java UI looper,
+    // so every access to the queue and its flags is guarded by `gattLock`.
+    private val gattLock = Any()
+    private val gattQueue = ArrayDeque<GattOp>()
+    private var gattBusy = false
+    private var gattWatchdog: Runnable? = null
 
     // Native entry points called from Rust. Declared inside the object, so they
     // are instance methods on the singleton and the Rust exports receive the
@@ -204,6 +238,7 @@ object ZippBridge {
     fun disconnect() {
         connectTimeout?.let { handler.removeCallbacks(it) }
         connectTimeout = null
+        resetGattQueue()
         characteristics.clear()
         gatt?.disconnect()
         gatt?.close()
@@ -213,7 +248,7 @@ object ZippBridge {
     /// Write to a characteristic, without a response when it supports one.
     @JvmStatic
     fun write(service: String, characteristic: String, bytes: ByteArray) {
-        val gatt = gatt ?: return
+        if (gatt == null) return
         val char = characteristics[UUID.fromString(characteristic)] ?: return
         val withoutResponse =
             char.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0
@@ -222,21 +257,104 @@ object ZippBridge {
         } else {
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         }
-        try {
-            gatt.writeCharacteristic(char, bytes, writeType)
-        } catch (error: Exception) {
-            onError("Command Failed: $error")
-        }
+        enqueueGatt(GattOp.Write(char, bytes, writeType))
     }
 
     @JvmStatic
     fun read(service: String, characteristic: String) {
-        val gatt = gatt ?: return
+        if (gatt == null) return
         val char = characteristics[UUID.fromString(characteristic)] ?: return
-        try {
-            gatt.readCharacteristic(char)
+        enqueueGatt(GattOp.Read(char))
+    }
+
+    private fun enqueueGatt(op: GattOp) {
+        synchronized(gattLock) { gattQueue.addLast(op) }
+        runNextGattOp()
+    }
+
+    /// Starts the next queued operation unless another one is still in flight.
+    private fun runNextGattOp() {
+        val next = synchronized(gattLock) {
+            if (gattBusy) return
+            val gatt = gatt ?: return
+            val op = gattQueue.removeFirstOrNull() ?: return
+            gattBusy = true
+            gatt to op
+        }
+        val (gatt, op) = next
+        val started = try {
+            when (op) {
+                is GattOp.Enable -> startEnable(gatt, op)
+                is GattOp.Read -> gatt.readCharacteristic(op.characteristic)
+                is GattOp.Write ->
+                    gatt.writeCharacteristic(op.characteristic, op.bytes, op.writeType) ==
+                        BluetoothStatusCodes.SUCCESS
+            }
         } catch (error: Exception) {
             onError("Command Failed: $error")
+            false
+        }
+        if (started) {
+            armGattWatchdog()
+        } else {
+            Log.w(LOG_TAG, "GATT op did not start: ${op.javaClass.simpleName}")
+            synchronized(gattLock) { gattBusy = false }
+            runNextGattOp()
+        }
+    }
+
+    private fun startEnable(gatt: BluetoothGatt, op: GattOp.Enable): Boolean {
+        if (!gatt.setCharacteristicNotification(op.characteristic, true)) {
+            Log.w(LOG_TAG, "setCharacteristicNotification failed for ${op.characteristic.uuid}")
+            return false
+        }
+        val descriptor = op.characteristic.getDescriptor(UUID.fromString(CCCD))
+        if (descriptor == null) {
+            Log.w(LOG_TAG, "no CCCD for ${op.characteristic.uuid}")
+            return false
+        }
+        val value = if (op.indicate) {
+            BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+        } else {
+            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        }
+        return gatt.writeDescriptor(descriptor, value) == BluetoothStatusCodes.SUCCESS
+    }
+
+    private fun finishGattOp() {
+        synchronized(gattLock) {
+            cancelGattWatchdogLocked()
+            gattBusy = false
+        }
+        runNextGattOp()
+    }
+
+    private fun armGattWatchdog() {
+        val watchdog = Runnable {
+            synchronized(gattLock) {
+                gattBusy = false
+                gattWatchdog = null
+            }
+            Log.w(LOG_TAG, "GATT op timed out; continuing")
+            runNextGattOp()
+        }
+        synchronized(gattLock) {
+            cancelGattWatchdogLocked()
+            gattWatchdog = watchdog
+        }
+        handler.postDelayed(watchdog, GATT_WATCHDOG_MS)
+    }
+
+    private fun cancelGattWatchdogLocked() {
+        gattWatchdog?.let { handler.removeCallbacks(it) }
+        gattWatchdog = null
+    }
+
+    private fun resetGattQueue() {
+        synchronized(gattLock) {
+            cancelGattWatchdogLocked()
+            gattQueue.clear()
+            gattBusy = false
         }
     }
 
@@ -266,6 +384,7 @@ object ZippBridge {
                 ZippBridge.onConnectionState(device.address, true)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 cancelConnectTimeout()
+                resetGattQueue()
                 characteristics.clear()
                 gatt.close()
                 if (this@ZippBridge.gatt === gatt) {
@@ -282,6 +401,7 @@ object ZippBridge {
                 ZippBridge.onError("Connection error: status $status")
                 return
             }
+            resetGattQueue()
             for (service in gatt.services) {
                 for (characteristic in service.characteristics) {
                     characteristics[characteristic.uuid] = characteristic
@@ -291,18 +411,10 @@ object ZippBridge {
                     val indicate =
                         (properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0
                     if (notify || indicate) {
-                        gatt.setCharacteristicNotification(characteristic, true)
-                        characteristic.getDescriptor(UUID.fromString(CCCD))?.let { descriptor ->
-                            val value = if (notify) {
-                                BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                            } else {
-                                BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                            }
-                            gatt.writeDescriptor(descriptor, value)
-                        }
+                        enqueueGatt(GattOp.Enable(characteristic, indicate && !notify))
                     }
                     if ((properties and BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
-                        gatt.readCharacteristic(characteristic)
+                        enqueueGatt(GattOp.Read(characteristic))
                     }
                 }
             }
@@ -324,6 +436,17 @@ object ZippBridge {
             ZippBridge.onNotification(characteristic.uuid.toString(), value)
         }
 
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int,
+        ) {
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                Log.w(LOG_TAG, "CCCD write failed for ${descriptor.characteristic.uuid}: $status")
+            }
+            finishGattOp()
+        }
+
         @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
         override fun onCharacteristicRead(
             gatt: BluetoothGatt,
@@ -335,6 +458,7 @@ object ZippBridge {
             } else {
                 ZippBridge.onError("Command Failed: status $status")
             }
+            finishGattOp()
         }
 
         override fun onCharacteristicRead(
@@ -348,6 +472,7 @@ object ZippBridge {
             } else {
                 ZippBridge.onError("Command Failed: status $status")
             }
+            finishGattOp()
         }
 
         override fun onCharacteristicWrite(
@@ -358,6 +483,7 @@ object ZippBridge {
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 ZippBridge.onError("Command Failed: status $status")
             }
+            finishGattOp()
         }
     }
 
