@@ -120,7 +120,7 @@ fn status_row(app: &App) -> Element<'_, Message> {
     } else {
         chrome::icon(icons::SEARCH, theme::SCAN_ICON_SIZE, theme::MUTED)
     };
-    let scan = button(container(scan_icon).center_x(Length::Fill))
+    let scan = button(scan_icon)
         .on_press(scan_message(session.scanning))
         .padding(8)
         .style(transparent);

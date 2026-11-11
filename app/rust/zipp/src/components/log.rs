@@ -54,7 +54,10 @@ pub fn terminal(app: &App) -> Element<'_, Message> {
                 .line_height(1.2),
         );
     }
-    let scroll = scrollable(lines).id(LOG_SCROLL).height(Length::Fill);
+    let scroll = scrollable(lines)
+        .id(LOG_SCROLL)
+        .width(Length::Fill)
+        .height(Length::Fill);
 
     let clear = button(text(strings.clear).size(theme::LOG_SIZE).color(theme::TEXT))
         .on_press(Message::ClearLogs)
@@ -100,7 +103,9 @@ pub fn terminal(app: &App) -> Element<'_, Message> {
         });
 
     container(column![
-        stack![scroll, clear_overlay].height(Length::Fill),
+        stack![scroll, clear_overlay]
+            .width(Length::Fill)
+            .height(Length::Fill),
         top_border,
         input_row,
     ])
