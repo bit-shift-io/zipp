@@ -54,6 +54,13 @@ unknown rather than estimated.
 - GPS: **not possible on this hardware** — the tablet exposes no `gps`
   provider (only `passive`, `network`, `fused`), so the app takes the `disabled`
   branch and renders no GPS row. Not a defect.
+  - Deliberate divergence from Flutter: the Android bridge requests updates from
+    `LocationManager.GPS_PROVIDER` only, whereas Flutter's `geolocator`
+    (`bestForNavigation`) used the Google **fused** provider, which would also
+    yield a coarse network fix on a GPS-less device (speed 0, and it would mask
+    the scooter's BLE speed). The port keeps GPS-only so the row/icon appears
+    only when a real GPS chip can supply speed; on a phone it behaves as
+    Flutter did (searching → active, speed from `Location.speed` in m/s → km/h).
 - Wi-Fi / Entry: **not exercised**. The entry path is unit-tested and the
   desktop binary installs `env_logger` (so `log::info!`/`log::warn!` reach
   stdout) and Android writes the same lines to logcat, but no input-synthesis
